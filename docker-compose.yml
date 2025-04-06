@@ -1,0 +1,70 @@
+version: "3.8"
+
+services:
+  zookeeper:
+    image: "confluentinc/cp-zookeeper:latest"
+    container_name: zookeeper
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+    networks:
+      - kafka-network
+
+  kafka:
+    image: "confluentinc/cp-kafka:latest"
+    container_name: kafka
+    depends_on:
+      - zookeeper
+    ports:
+      - "9092:9092"
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+    networks:
+      - kafka-network
+
+  kafka-rest:
+    image: confluentinc/cp-kafka-rest:latest
+    container_name: kafka-rest
+    depends_on:
+      - kafka
+    ports:
+      - "8082:8082"
+    environment:
+      KAFKA_REST_BOOTSTRAP_SERVERS: "PLAINTEXT://kafka:9092"
+      KAFKA_REST_LISTENERS: "http://0.0.0.0:8082"
+      KAFKA_REST_HOST_NAME: "kafka-rest"
+    networks:
+      - kafka-network
+
+  producer-service:
+    build: ./producer-service
+    container_name: producer-service
+    depends_on:
+      - kafka
+    environment:
+      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+    networks:
+      - kafka-network
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./FOLDERRECB:/app/FOLDERRECB
+      - ./FOLDEREXCEL:/app/FOLDEREXCEL
+
+  consumer-python:
+    build: ./consumer-python
+    container_name: consumer-python
+    depends_on:
+      - kafka
+    environment:
+      KAFKA_BROKER: kafka:9092
+    networks:
+      - kafka-network
+    command: ["sh", "-c", "while true; do python consumer.py; sleep 5; done"]
+
+networks:
+  kafka-network:
+    driver: bridge
