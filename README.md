@@ -11,7 +11,7 @@ This project implements a sales processing system using Apache Kafka for communi
 
 ---
 
-🏗️ Project Architecture
+## 🏗️ Project Architecture
 The project follows an event-driven architecture with Kafka as the messaging system. It consists of the following components:
 
 Producer (Spring Boot)
@@ -38,7 +38,7 @@ Creates a chart grouping sales by month.
 
 Saves files in the FOLDEREXCEL directory.
 
-🛠️ Technologies Used
+## 🛠️ Technologies Used
 🔹 Backend (Producer)
 Java 17
 
@@ -62,7 +62,7 @@ Docker Compose (for service orchestration)
 
 Apache Kafka & Zookeeper (for event management)
 
-🚀 How to Run the Project
+## 🚀 How to Run the Project
 🔹 Step 1: Clone the Repository
 sh
 Copy
